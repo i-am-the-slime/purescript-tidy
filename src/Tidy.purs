@@ -33,7 +33,7 @@ import Data.Tuple (Tuple(..), fst, snd)
 import Dodo as Dodo
 import Partial.Unsafe (unsafeCrashWith)
 import PureScript.CST.Errors (RecoveredError(..))
-import PureScript.CST.Types (AppSpine(..), Binder(..), ClassFundep(..), ClassHead, Comment(..), DataCtor(..), DataHead, DataMembers(..), Declaration(..), Delimited, DelimitedNonEmpty, DerivingClassHead(..), DerivingClause(..), DoStatement(..), Export(..), Expr(..), FixityOp(..), Foreign(..), Guarded(..), GuardedExpr(..), Ident, IfThenElse, Import(..), ImportDecl(..), Instance(..), InstanceBinding(..), InstanceHead, Label, Labeled(..), LetBinding(..), LineFeed, Module(..), ModuleBody(..), ModuleHeader(..), ModuleName, Name(..), OneOrDelimited(..), Operator, PatternGuard(..), Prefixed(..), Proper, QualifiedName(..), RecordLabeled(..), RecordUpdate(..), Row(..), Separated(..), SourceStyle(..), SourceToken, Token(..), Type(..), TypeVarBinding(..), ValueBindingFields, Where(..), Wrapped(..))
+import PureScript.CST.Types (AppSpine(..), Binder(..), ClassFundep(..), ClassHead, Comment(..), DataCtor(..), DataHead, DataMembers(..), Declaration(..), Delimited, DelimitedNonEmpty, DeriveClassHead(..), DeriveClause(..), DoStatement(..), Export(..), Expr(..), FixityOp(..), Foreign(..), Guarded(..), GuardedExpr(..), Ident, IfThenElse, Import(..), ImportDecl(..), Instance(..), InstanceBinding(..), InstanceHead, Label, Labeled(..), LetBinding(..), LineFeed, Module(..), ModuleBody(..), ModuleHeader(..), ModuleName, Name(..), OneOrDelimited(..), Operator, PatternGuard(..), Prefixed(..), Proper, QualifiedName(..), RecordLabeled(..), RecordUpdate(..), Row(..), Separated(..), SourceStyle(..), SourceToken, Token(..), Type(..), TypeVarBinding(..), ValueBindingFields, Where(..), Wrapped(..))
 import Tidy.Doc (FormatDoc, align, alignCurrentColumn, anchor, break, flexDoubleBreak, flexGroup, flexSoftBreak, flexSpaceBreak, forceMinSourceBreaks, fromDoc, indent, joinWith, joinWithMap, leadingBlockComment, leadingLineComment, locally, softBreak, softSpace, sourceBreak, space, spaceBreak, text, trailingBlockComment, trailingLineComment)
 import Tidy.Doc (FormatDoc, toDoc) as Exports
 import Tidy.Doc as Doc
@@ -525,29 +525,29 @@ formatDataHead conf { keyword, name, vars } =
     anchor (formatName conf name)
       `flexSpaceBreak` joinWithMap spaceBreak (formatTypeVarBindingPlain conf) vars
 
-formatDeclWithDerivs :: forall e a. FormatOptions e a -> Array (DerivingClause e) -> FormatDoc a -> FormatDoc a
+formatDeclWithDerivs :: forall e a. FormatOptions e a -> Array (DeriveClause e) -> FormatDoc a -> FormatDoc a
 formatDeclWithDerivs conf derivs declDoc =
   case derivs of
     [] -> declDoc
-    _ -> declDoc `break` indent (joinWithMap break (formatDerivingClause conf) derivs)
+    _ -> declDoc `break` indent (joinWithMap break (formatDeriveClause conf) derivs)
 
-formatDerivingClause :: forall e a. Format (DerivingClause e) e a
-formatDerivingClause conf = case _ of
-  DerivingClauseStandard kw classes ->
+formatDeriveClause :: forall e a. Format (DeriveClause e) e a
+formatDeriveClause conf = case _ of
+  DeriveClauseStandard kw classes ->
     formatToken conf kw
-      `space` anchor (formatParenListNonEmpty Grouped formatDerivingClassHead conf classes)
-  DerivingClauseNewtype kw nt classes ->
+      `space` anchor (formatParenListNonEmpty Grouped formatDeriveClassHead conf classes)
+  DeriveClauseNewtype kw nt classes ->
     formatToken conf kw
       `space` anchor (formatToken conf nt)
-      `space` anchor (formatParenListNonEmpty Grouped formatDerivingClassHead conf classes)
-  DerivingClauseVia kw classes viaTok viaTy ->
+      `space` anchor (formatParenListNonEmpty Grouped formatDeriveClassHead conf classes)
+  DeriveClauseVia kw classes viaTok viaTy ->
     formatToken conf kw
-      `space` anchor (formatParenListNonEmpty Grouped formatDerivingClassHead conf classes)
+      `space` anchor (formatParenListNonEmpty Grouped formatDeriveClassHead conf classes)
       `space` anchor (formatToken conf viaTok)
       `space` anchor (formatType conf viaTy)
 
-formatDerivingClassHead :: forall e a. Format (DerivingClassHead e) e a
-formatDerivingClassHead conf (DerivingClassHead { className, args }) =
+formatDeriveClassHead :: forall e a. Format (DeriveClassHead e) e a
+formatDeriveClassHead conf (DeriveClassHead { className, args }) =
   case args of
     [] -> formatQualifiedName conf className
     _ ->
